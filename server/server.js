@@ -13,7 +13,7 @@ var { mongoose } = require('./db/mongoose');
 
 var app = express();
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8010;
 
 app.use(bodyparser.json());
 
