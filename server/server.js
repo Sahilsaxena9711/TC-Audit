@@ -17,7 +17,6 @@ const port = process.env.PORT;
 
 app.use(bodyparser.json());
 
-
 //AUTH API
 
 //SIGNUP
