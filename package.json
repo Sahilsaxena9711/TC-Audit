@@ -19,5 +19,9 @@
     "mongodb": "^3.1.10",
     "mongoose": "^5.2.8",
     "nodemailer": "^5.0.0"
+  },
+  "engines": {
+    "node": "8.11.4",
+    "npm": "5.x"
   }
 }
