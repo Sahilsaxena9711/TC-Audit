@@ -13,7 +13,8 @@ var { mongoose } = require('./db/mongoose');
 
 var app = express();
 
-const port = process.env.PORT || 8010;
+console.log(process.env.PORT);
+const port = process.env.PORT || 8080;
 
 app.use(bodyparser.json());
 
@@ -218,7 +219,7 @@ app.post('/audit/add', authenticate, (req, res) => {
 });
 
 
-app.listen(port, () => {
+app.listen(port, function(){
     console.log(`Starting app on port ${port}`);
 });
 module.exports = { app };
