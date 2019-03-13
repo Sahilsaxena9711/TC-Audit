@@ -147,7 +147,7 @@ app.get('/inventory', authenticate, (req, res) => {
 //ASSIGN INV
 app.post('/inventory/assign', authenticate, (req, res) => {
     if (req.emp.role == "HR") {
-        let body = _.pick(req.body, ['empId', 'invId']);
+        let body = _.pick(req.body, ['empId', 'name', 'invId']);
         Inventory.findOne({ invId: body.invId }).then((inv) => {
             if (!inv) {
                 res.status(200).send({
@@ -157,6 +157,7 @@ app.post('/inventory/assign', authenticate, (req, res) => {
                 });
             } else {
                 inv.empId = body.empId;
+                inv.name = body.name;
                 inv.save().then((inv) => {
                     res.status(200).send({
                         data: { data: inv, message: "Request Completed Successfully" },
