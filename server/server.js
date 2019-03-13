@@ -171,6 +171,33 @@ app.post('/inventory/assign', authenticate, (req, res) => {
 });
 
 
+//AUDIT
+
+//GET AUDIT
+app.get('/audit', authenticate, (req,res) => {
+    if(req.emp.role == "HR"){
+        Audit.find().then((audit) => {
+            res.status(200).send({
+                data: { data: audit, message: "Request Completed Successfully" },
+                code: 2000,
+                error: null
+            });
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });    
+        })
+    }else{
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: "This request can only be made by HR"
+        });
+    }
+})
+
 //ADD AUDIT
 app.post('/audit/add', authenticate, (req, res) => {
     var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type', 'comment', 'date'])
