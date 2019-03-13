@@ -109,6 +109,23 @@ app.post('/inventory/add', authenticate, (req, res) => {
     });
 });
 
+//ALL INV
+app.get('/inventory/all', authenticate, (req, res) => {
+    Inventory.find().then((inv) => {
+        res.status(200).send({
+            data: { data: inv, message: `Request Completed Successfully!` },
+            code: 2000,
+            error: null
+        });
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    });
+});
+
 //INV BY EMPID
 app.get('/inventory', authenticate, (req, res) => {
     var empId = req.emp.empId;
