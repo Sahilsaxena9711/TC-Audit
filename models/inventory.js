@@ -5,6 +5,10 @@ var InventorySchema = new mongoose.Schema({
         type: String,
         default: "NA"
     },
+    name: {
+        type: String,
+        default: "NA"
+    },
     invId: {
         type: String,
         required: true,

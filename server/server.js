@@ -46,7 +46,7 @@ app.get('/employee/all', authenticate, (req, res) => {
     if (req.emp.role == "HR") {
         Employee.find().then((emp) => {
             let names = _.map(emp, function (object) {
-                return _.pick(object, ['name']);
+                return _.pick(object, ['name', 'empId']);
             });
             res.status(200).send({
                 data: { data: names, message: "Request Completed Successfully" },
@@ -92,7 +92,7 @@ app.post('/employee/login', (req, res) => {
 
 //ADD INV
 app.post('/inventory/add', authenticate, (req, res) => {
-    var body = _.pick(req.body, ['empId', 'invId', 'invBrand', 'invName', 'type'])
+    var body = _.pick(req.body, ['empId', 'name', 'invId', 'invBrand', 'invName', 'type'])
     var inv = new Inventory(body);
     inv.save().then((inv) => {
         res.status(200).send({
@@ -219,7 +219,7 @@ app.get('/audit', authenticate, (req,res) => {
 app.post('/audit/add', authenticate, (req, res) => {
     var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type', 'comment', 'date'])
     body.empId = req.emp.empId;
-
+    body.name = req.emp.name;
     Audit.findOne({ invId: body.invId }).then((aud) => {
         if (!aud) {
             var audit = new Audit(body);

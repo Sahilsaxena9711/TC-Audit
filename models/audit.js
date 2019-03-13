@@ -5,6 +5,10 @@ var AuditSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    name: {
+        type: String,
+        required: true
+    },
     invId: {
         type: String,
         required: true,

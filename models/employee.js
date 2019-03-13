@@ -39,7 +39,7 @@ var EmployeeSchema = new mongoose.Schema({
 EmployeeSchema.methods.toJSON = function () {
     var emp = this;
     var empObject = emp.toObject();
-    return _.pick(empObject, ["empId", "tokens", "_id", "role"])
+    return _.pick(empObject, ["empId", "tokens", "_id", "role", "name"])
 }
 
 EmployeeSchema.methods.generateAuthToken = function () {
