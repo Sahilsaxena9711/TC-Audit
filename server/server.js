@@ -227,7 +227,7 @@ app.post('/audit/add', authenticate, (req, res) => {
             audit.save().then((audit) => {
                 res.status(200).send({
                     data: { data: audit, message: "Audit Added Successfully" },
-                    code: 4000,
+                    code: 2000,
                     error: null
                 });
             }).catch((e) => {
