@@ -238,6 +238,7 @@ app.post('/audit/add', authenticate, (req, res) => {
                 });
             })
         } else {
+            aud.status = body.status;
             aud.comment = body.comment;
             aud.date = body.date;
             aud.save().then(() => {
