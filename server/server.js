@@ -218,7 +218,7 @@ app.get('/audit', authenticate, (req,res) => {
 
 //ADD AUDIT
 app.post('/audit/add', authenticate, (req, res) => {
-    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type', 'comment', 'date'])
+    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type', 'status', 'comment', 'date'])
     body.empId = req.emp.empId;
     body.name = req.emp.name;
     Audit.findOne({ invId: body.invId }).then((aud) => {

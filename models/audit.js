@@ -33,6 +33,10 @@ var AuditSchema = new mongoose.Schema({
     date: {
         type: Date,
         required: true
+    },
+    status: {
+        type: String,
+        required: true
     }
 });
 
