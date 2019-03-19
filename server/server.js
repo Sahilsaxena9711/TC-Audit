@@ -18,6 +18,27 @@ const port = process.env.PORT || 8080;
 
 app.use(bodyparser.json());
 
+
+
+app.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'x-auth-token,content-type');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    // res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});
+
 //AUTH API
 
 //SIGNUP
@@ -92,8 +113,8 @@ app.post('/employee/login', (req, res) => {
 
 //ADD INV
 app.post('/inventory/add', authenticate, (req, res) => {
-    var body = _.pick(req.body, ['empId', 'name', 'invId', 'invBrand', 'invName', 'type'])
-    var inv = new Inventory(body);
+    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type'])
+    var inv = new Audit(body);
     inv.save().then((inv) => {
         res.status(200).send({
             data: { data: inv, message: `Inventory Added Successfully!` },
@@ -111,7 +132,7 @@ app.post('/inventory/add', authenticate, (req, res) => {
 
 //ALL INV
 app.get('/inventory/all', authenticate, (req, res) => {
-    Inventory.find().then((inv) => {
+    Audit.find().then((inv) => {
         res.status(200).send({
             data: { data: inv, message: `Request Completed Successfully!` },
             code: 2000,
@@ -129,7 +150,7 @@ app.get('/inventory/all', authenticate, (req, res) => {
 //INV BY EMPID
 app.get('/inventory', authenticate, (req, res) => {
     var empId = req.emp.empId;
-    Inventory.find({ empId }).then((inv) => {
+    Audit.find({ empId }).then((inv) => {
         res.status(200).send({
             data: { data: inv, message: "Request Completed Successfully" },
             code: 2000,
@@ -148,7 +169,7 @@ app.get('/inventory', authenticate, (req, res) => {
 app.post('/inventory/assign', authenticate, (req, res) => {
     if (req.emp.role == "HR") {
         let body = _.pick(req.body, ['empId', 'name', 'invId']);
-        Inventory.findOne({ invId: body.invId }).then((inv) => {
+        Audit.findOne({ invId: body.invId }).then((inv) => {
             if (!inv) {
                 res.status(200).send({
                     data: null,
@@ -191,7 +212,7 @@ app.post('/inventory/assign', authenticate, (req, res) => {
 //UNASSIGNED INV
 app.get('/inventory/unassigned', authenticate, (req, res) => {
     if (req.emp.role == "HR") {
-        Inventory.find({empId: "NA"}).then((inventory) => {
+        Audit.find({empId: "NA"}).then((inventory) => {
             res.status(200).send({
                 data: { data: inventory, message: "Request Completed Successfully" },
                 code: 2000,
@@ -219,7 +240,7 @@ app.get('/inventory/unassigned', authenticate, (req, res) => {
 //GET AUDIT
 app.get('/audit', authenticate, (req,res) => {
     if(req.emp.role == "HR"){
-        Audit.find().then((audit) => {
+        Audit.find({empId: { $not: { $eq:"NA"}}, comment: { $not: { $eq:"NA"}}}).then((audit) => {
             res.status(200).send({
                 data: { data: audit, message: "Request Completed Successfully" },
                 code: 2000,
@@ -243,25 +264,25 @@ app.get('/audit', authenticate, (req,res) => {
 
 //ADD AUDIT
 app.post('/audit/add', authenticate, (req, res) => {
-    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'month', 'type', 'status', 'comment', 'date'])
+    var body = _.pick(req.body, ['invId', 'month', 'status', 'comment', 'date'])
     body.empId = req.emp.empId;
     body.name = req.emp.name;
     Audit.findOne({ invId: body.invId }).then((aud) => {
         if (!aud) {
-            var audit = new Audit(body);
-            audit.save().then((audit) => {
-                res.status(200).send({
-                    data: { data: audit, message: "Audit Added Successfully" },
-                    code: 2000,
-                    error: null
-                });
-            }).catch((e) => {
+            // var audit = new Audit(body);
+            // audit.save().then((audit) => {
+            //     res.status(200).send({
+            //         data: { data: audit, message: "Audit Added Successfully" },
+            //         code: 2000,
+            //         error: null
+            //     });
+            // }).catch((e) => {
                 res.status(200).send({
                     data: null,
                     code: 4000,
-                    error: e.message
+                    error: `No Inventory Found with Inventory ID ${body.invId}`
                 });
-            })
+            // })
         } else {
             aud.status = body.status;
             aud.comment = body.comment;
@@ -293,7 +314,7 @@ app.post('/audit/add', authenticate, (req, res) => {
 //GET UNAUDITED INV
 app.get('/audit/unaudited/:month', authenticate, (req, res) => {
     var month = req.params.month;
-    Audit.find({month : { $not : { $eq: month }}}).then((aud) => {
+    Audit.find({month : { $not : { $eq: month }}, empId : { $not : { $eq: "NA" }}}).then((aud) => {
         res.status(200).send({
             data: { data: aud, message: "Audit Added Successfully" },
             code: 2000,

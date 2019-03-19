@@ -3,11 +3,13 @@ var mongoose = require('mongoose');
 var AuditSchema = new mongoose.Schema({
     empId: {
         type: String,
-        required: true
+        required: true,
+        default: "NA"
     },
     name: {
         type: String,
-        required: true
+        required: true,
+        default: "NA"
     },
     invId: {
         type: String,
@@ -28,19 +30,23 @@ var AuditSchema = new mongoose.Schema({
     },
     comment: {
         type: String,
-        required: true
+        required: true,
+        default: "NA"
     },
     date: {
         type: Date,
-        required: true
+        // required: true,
+        // default: "NA"
     },
     status: {
         type: String,
-        required: true
+        required: true,
+        default: "NA"
     },
     month: {
         type: String,
-        required: true
+        required: true,
+        default: "NA"
     }
 });
 
