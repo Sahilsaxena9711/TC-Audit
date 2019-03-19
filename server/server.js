@@ -188,6 +188,31 @@ app.post('/inventory/assign', authenticate, (req, res) => {
     }
 });
 
+//UNASSIGNED INV
+app.get('/inventory/unassigned', authenticate, (req, res) => {
+    if (req.emp.role == "HR") {
+        Inventory.find({empId: "NA"}).then((inventory) => {
+            res.status(200).send({
+                data: { data: inventory, message: "Request Completed Successfully" },
+                code: 2000,
+                error: null
+            });
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });
+        })
+    }else{
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: "This request can only be made by HR"
+        });
+    }
+})
+
 
 //AUDIT
 
