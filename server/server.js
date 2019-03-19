@@ -243,7 +243,7 @@ app.get('/audit', authenticate, (req,res) => {
 
 //ADD AUDIT
 app.post('/audit/add', authenticate, (req, res) => {
-    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type', 'status', 'comment', 'date'])
+    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'month', 'type', 'status', 'comment', 'date'])
     body.empId = req.emp.empId;
     body.name = req.emp.name;
     Audit.findOne({ invId: body.invId }).then((aud) => {
@@ -265,6 +265,7 @@ app.post('/audit/add', authenticate, (req, res) => {
         } else {
             aud.status = body.status;
             aud.comment = body.comment;
+            aud.month = body.month
             aud.date = body.date;
             aud.save().then(() => {
                 res.status(200).send({
@@ -288,6 +289,24 @@ app.post('/audit/add', authenticate, (req, res) => {
         });
     });
 });
+
+//GET UNAUDITED INV
+app.get('/audit/unaudited/:month', authenticate, (req, res) => {
+    var month = req.params.month;
+    Audit.find({month : { $not : { $eq: month }}}).then((aud) => {
+        res.status(200).send({
+            data: { data: aud, message: "Audit Added Successfully" },
+            code: 2000,
+            error: null
+        });
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    })
+})
 
 
 app.listen(port, function(){
