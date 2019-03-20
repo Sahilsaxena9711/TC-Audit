@@ -4,7 +4,7 @@ var express = require('express');
 var bodyparser = require('body-parser');
 var _ = require('lodash')
 var { Employee } = require('../models/employee');
-var { Inventory } = require('../models/inventory');
+var { Requirement } = require('../models/requirement');
 var { Audit } = require('../models/audit');
 var { authenticate } = require('../middleware/authenticate');
 var { pathAuth } = require('../middleware/pathAuth');
@@ -320,6 +320,97 @@ app.get('/audit/unaudited/:month', authenticate, (req, res) => {
             code: 2000,
             error: null
         });
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    })
+})
+
+
+//REQUIREMENT
+
+//ADD REQUIREMNT
+app.post('/requirement/add', authenticate, (req, res) => {
+    var body = _.pick(req.body, ['comment', 'date']);
+    body.name = req.emp.name;
+    body.empId = req.emp.empId
+    var requirement = new Requirement(body);
+    requirement.save().then(() => {
+        res.status(200).send({
+            data: { data: requirement, message: "Requirement Added Successfully" },
+            code: 2000,
+            error: null
+        });
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    })
+})
+
+app.get('/requirement/my', authenticate, (req,res) => {
+    var empId = req.emp.empId;
+    Requirement.find({empId}).then((requirement) => {
+        res.status(200).send({
+            data: { data: requirement, message: "Request Completed Successfully" },
+            code: 2000,
+            error: null
+        });
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    })
+})
+
+app.get('/requirement/all/pending', authenticate, (req,res) => {
+    Requirement.find({status: "Pending"}).then((requirement) => {
+        res.status(200).send({
+            data: { data: requirement, message: "Request Completed Successfully" },
+            code: 2000,
+            error: null
+        });
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    })
+})
+
+app.get('/requirement/complete/:id', authenticate, (req,res) => {
+    var id = req.params.id
+    Requirement.findOne({_id: id}).then((requirement) => {
+        if(!requirement){
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: `Requirement not found`
+            });
+        }else{
+            requirement.status = "Approved";
+            requirement.save().then(() => {
+                res.status(200).send({
+                    data: { data: requirement, message: "Requiremnet Approved Successfully" },
+                    code: 2000,
+                    error: null
+                });
+            }).catch((e) => {
+                res.status(200).send({
+                    data: null,
+                    code: 4000,
+                    error: e.message
+                });
+            })
+        }
     }).catch((e) => {
         res.status(200).send({
             data: null,
