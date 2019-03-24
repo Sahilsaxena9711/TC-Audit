@@ -62,6 +62,33 @@ app.post('/employee', (req, res) => {
     });
 });
 
+app.post('/employee/changePassword', authenticate, (req, res) => {
+    var body = _.pick(req.body, ['oldPassword', 'newPassword']);
+
+    Employee.findByCredential(req.emp.empId, body.oldPassword).then((emp) => {
+        emp.password = body.newPassword
+        emp.save().then(() => {
+            res.status(200).send({
+                data: { data: null, message: `Password Changed Successfully` },
+                code: 2000,
+                error: null
+            });
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });
+        })
+    }).catch(() => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: "Error the old password was incorrect"
+        });
+    })
+});
+
 //GET ALL USER
 app.get('/employee/all', authenticate, (req, res) => {
     if (req.emp.role == "HR") {
@@ -212,7 +239,7 @@ app.post('/inventory/assign', authenticate, (req, res) => {
 //UNASSIGNED INV
 app.get('/inventory/unassigned', authenticate, (req, res) => {
     if (req.emp.role == "HR") {
-        Audit.find({empId: "NA"}).then((inventory) => {
+        Audit.find({ empId: "NA" }).then((inventory) => {
             res.status(200).send({
                 data: { data: inventory, message: "Request Completed Successfully" },
                 code: 2000,
@@ -225,7 +252,7 @@ app.get('/inventory/unassigned', authenticate, (req, res) => {
                 error: e.message
             });
         })
-    }else{
+    } else {
         res.status(200).send({
             data: null,
             code: 4000,
@@ -238,9 +265,9 @@ app.get('/inventory/unassigned', authenticate, (req, res) => {
 //AUDIT
 
 //GET AUDIT
-app.get('/audit', authenticate, (req,res) => {
-    if(req.emp.role == "HR"){
-        Audit.find({empId: { $not: { $eq:"NA"}}, comment: { $not: { $eq:"NA"}}}).then((audit) => {
+app.get('/audit', authenticate, (req, res) => {
+    if (req.emp.role == "HR") {
+        Audit.find({ empId: { $not: { $eq: "NA" } }, comment: { $not: { $eq: "NA" } } }).then((audit) => {
             res.status(200).send({
                 data: { data: audit, message: "Request Completed Successfully" },
                 code: 2000,
@@ -251,9 +278,9 @@ app.get('/audit', authenticate, (req,res) => {
                 data: null,
                 code: 4000,
                 error: e.message
-            });    
+            });
         })
-    }else{
+    } else {
         res.status(200).send({
             data: null,
             code: 4000,
@@ -277,11 +304,11 @@ app.post('/audit/add', authenticate, (req, res) => {
             //         error: null
             //     });
             // }).catch((e) => {
-                res.status(200).send({
-                    data: null,
-                    code: 4000,
-                    error: `No Inventory Found with Inventory ID ${body.invId}`
-                });
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: `No Inventory Found with Inventory ID ${body.invId}`
+            });
             // })
         } else {
             aud.status = body.status;
@@ -314,7 +341,7 @@ app.post('/audit/add', authenticate, (req, res) => {
 //GET UNAUDITED INV
 app.get('/audit/unaudited/:month', authenticate, (req, res) => {
     var month = req.params.month;
-    Audit.find({month : { $not : { $eq: month }}, empId : { $not : { $eq: "NA" }}}).then((aud) => {
+    Audit.find({ month: { $not: { $eq: month } }, empId: { $not: { $eq: "NA" } } }).then((aud) => {
         res.status(200).send({
             data: { data: aud, message: "Audit Added Successfully" },
             code: 2000,
@@ -353,9 +380,9 @@ app.post('/requirement/add', authenticate, (req, res) => {
     })
 })
 
-app.get('/requirement/my', authenticate, (req,res) => {
+app.get('/requirement/my', authenticate, (req, res) => {
     var empId = req.emp.empId;
-    Requirement.find({empId}).then((requirement) => {
+    Requirement.find({ empId }).then((requirement) => {
         res.status(200).send({
             data: { data: requirement, message: "Request Completed Successfully" },
             code: 2000,
@@ -370,8 +397,8 @@ app.get('/requirement/my', authenticate, (req,res) => {
     })
 })
 
-app.get('/requirement/all/pending', authenticate, (req,res) => {
-    Requirement.find({status: "Pending"}).then((requirement) => {
+app.get('/requirement/all/pending', authenticate, (req, res) => {
+    Requirement.find({ status: "Pending" }).then((requirement) => {
         res.status(200).send({
             data: { data: requirement, message: "Request Completed Successfully" },
             code: 2000,
@@ -386,16 +413,16 @@ app.get('/requirement/all/pending', authenticate, (req,res) => {
     })
 })
 
-app.get('/requirement/complete/:id', authenticate, (req,res) => {
+app.get('/requirement/complete/:id', authenticate, (req, res) => {
     var id = req.params.id
-    Requirement.findOne({_id: id}).then((requirement) => {
-        if(!requirement){
+    Requirement.findOne({ _id: id }).then((requirement) => {
+        if (!requirement) {
             res.status(200).send({
                 data: null,
                 code: 4000,
                 error: `Requirement not found`
             });
-        }else{
+        } else {
             requirement.status = "Approved";
             requirement.save().then(() => {
                 res.status(200).send({
@@ -421,7 +448,7 @@ app.get('/requirement/complete/:id', authenticate, (req,res) => {
 })
 
 
-app.listen(port, function(){
+app.listen(port, function () {
     console.log(`Starting app on port ${port}`);
 });
 module.exports = { app };
