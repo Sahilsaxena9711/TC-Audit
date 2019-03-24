@@ -38,6 +38,10 @@ var AuditSchema = new mongoose.Schema({
         // required: true,
         // default: "NA"
     },
+    billImage: {
+        type: String,
+        default: "NA"
+    },
     status: {
         type: String,
         required: true,

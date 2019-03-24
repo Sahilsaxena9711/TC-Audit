@@ -140,7 +140,7 @@ app.post('/employee/login', (req, res) => {
 
 //ADD INV
 app.post('/inventory/add', authenticate, (req, res) => {
-    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type'])
+    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type', 'billImage'])
     var inv = new Audit(body);
     inv.save().then((inv) => {
         res.status(200).send({
