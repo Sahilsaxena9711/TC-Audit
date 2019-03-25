@@ -157,6 +157,27 @@ app.post('/inventory/add', authenticate, (req, res) => {
     });
 });
 
+//ADD INV BY EMP
+app.post('/inventory/emp/add', authenticate, (req, res) => {
+    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type', 'billImage'])
+    body.name = req.emp.name;
+    body.empId = req.emp.empId;
+    var inv = new Audit(body);
+    inv.save().then((inv) => {
+        res.status(200).send({
+            data: { data: inv, message: `Inventory Added Successfully!` },
+            code: 2000,
+            error: null
+        });
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    });
+});
+
 //ALL INV
 app.get('/inventory/all', authenticate, (req, res) => {
     Audit.find().then((inv) => {
