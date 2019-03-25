@@ -178,6 +178,44 @@ app.post('/inventory/emp/add', authenticate, (req, res) => {
     });
 });
 
+//INV EDIT 
+app.post('/inventory/edit', authenticate, (req, res) => {
+    var body = _.pick(req.body, ['invId', 'invName', 'invBrand', 'type', 'id'])
+    Audit.findOne({ _id: body.id }).then((aud) => {
+        if (!aud) {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: 'No Inventory found with that Inventory ID'
+            });
+        } else {
+            aud.invId = body.invId;
+            aud.invName = body.invName;
+            aud.invBrand = body.invBrand;
+            aud.type = body.type;
+            aud.save().then(() => {
+                res.status(200).send({
+                    data: { data: aud, message: `Inventory Edited Successfully!` },
+                    code: 2000,
+                    error: null
+                });
+            }).catch((e) => {
+                res.status(200).send({
+                    data: null,
+                    code: 4000,
+                    error: `Inventory with Inventory ID ${body.invId} already exists`
+                });
+            })
+        }
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    });
+})
+
 //ALL INV
 app.get('/inventory/all', authenticate, (req, res) => {
     Audit.find().then((inv) => {
