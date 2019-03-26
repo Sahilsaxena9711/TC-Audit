@@ -485,7 +485,7 @@ app.get('/requirement/complete/:id', authenticate, (req, res) => {
             requirement.status = "Approved";
             requirement.save().then(() => {
                 res.status(200).send({
-                    data: { data: requirement, message: "Requiremnet Approved Successfully" },
+                    data: { data: requirement, message: "Requirement Approved Successfully" },
                     code: 2000,
                     error: null
                 });
@@ -519,7 +519,7 @@ app.get('/requirement/reject/:id', authenticate, (req, res) => {
             requirement.status = "Rejected";
             requirement.save().then(() => {
                 res.status(200).send({
-                    data: { data: requirement, message: "Requiremnet Rejected Successfully" },
+                    data: { data: requirement, message: "Requirement Rejected Successfully" },
                     code: 2000,
                     error: null
                 });
