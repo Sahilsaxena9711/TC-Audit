@@ -13,6 +13,11 @@ var RequirementSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    commentHr: {
+        type: String,
+        required: true,
+        default: "NA"
+    },
     date: {
         type: Date,
         required: true

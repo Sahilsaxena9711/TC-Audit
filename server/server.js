@@ -506,6 +506,74 @@ app.get('/requirement/complete/:id', authenticate, (req, res) => {
     })
 })
 
+app.get('/requirement/reject/:id', authenticate, (req, res) => {
+    var id = req.params.id
+    Requirement.findOne({ _id: id }).then((requirement) => {
+        if (!requirement) {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: `Requirement not found`
+            });
+        } else {
+            requirement.status = "Rejected";
+            requirement.save().then(() => {
+                res.status(200).send({
+                    data: { data: requirement, message: "Requiremnet Rejected Successfully" },
+                    code: 2000,
+                    error: null
+                });
+            }).catch((e) => {
+                res.status(200).send({
+                    data: null,
+                    code: 4000,
+                    error: e.message
+                });
+            })
+        }
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    })
+})
+
+app.post('/requirement/commenthr', authenticate, (req, res) => {
+    var body = _.pick(req.body, ['id', 'commentHr']);
+    Requirement.findOne({ _id: body.id }).then((requirement) => {
+        if (!requirement) {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: `Requirement not found`
+            });
+        } else {
+            requirement.commentHr = body.commentHr;
+            requirement.save().then(() => {
+                res.status(200).send({
+                    data: { data: requirement, message: "Comment Added Successfully" },
+                    code: 2000,
+                    error: null
+                });
+            }).catch((e) => {
+                res.status(200).send({
+                    data: null,
+                    code: 4000,
+                    error: e.message
+                });
+            })
+        }
+    }).catch((e) => {
+        res.status(200).send({
+            data: null,
+            code: 4000,
+            error: e.message
+        });
+    })
+})
+
 
 app.listen(port, function () {
     console.log(`Starting app on port ${port}`);
