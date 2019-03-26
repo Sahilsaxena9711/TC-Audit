@@ -140,21 +140,29 @@ app.post('/employee/login', (req, res) => {
 
 //ADD INV
 app.post('/inventory/add', authenticate, (req, res) => {
-    var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type', 'billImage'])
-    var inv = new Audit(body);
-    inv.save().then((inv) => {
-        res.status(200).send({
-            data: { data: inv, message: `Inventory Added Successfully!` },
-            code: 2000,
-            error: null
+    if (req.emp.role == "HR") {
+        var body = _.pick(req.body, ['invId', 'invBrand', 'invName', 'type', 'billImage'])
+        var inv = new Audit(body);
+        inv.save().then((inv) => {
+            res.status(200).send({
+                data: { data: inv, message: `Inventory Added Successfully!` },
+                code: 2000,
+                error: null
+            });
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });
         });
-    }).catch((e) => {
+    } else {
         res.status(200).send({
             data: null,
             code: 4000,
-            error: e.message
+            error: "This request can only be made by HR"
         });
-    });
+    }
 });
 
 //ADD INV BY EMP
@@ -218,19 +226,27 @@ app.post('/inventory/edit', authenticate, (req, res) => {
 
 //ALL INV
 app.get('/inventory/all', authenticate, (req, res) => {
-    Audit.find().then((inv) => {
-        res.status(200).send({
-            data: { data: inv, message: `Request Completed Successfully!` },
-            code: 2000,
-            error: null
+    if (req.emp.role == "HR") {
+        Audit.find().then((inv) => {
+            res.status(200).send({
+                data: { data: inv, message: `Request Completed Successfully!` },
+                code: 2000,
+                error: null
+            });
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });
         });
-    }).catch((e) => {
+    } else {
         res.status(200).send({
             data: null,
             code: 4000,
-            error: e.message
+            error: "This request can only be made by HR"
         });
-    });
+    }
 });
 
 //INV BY EMPID
@@ -399,20 +415,28 @@ app.post('/audit/add', authenticate, (req, res) => {
 
 //GET UNAUDITED INV
 app.get('/audit/unaudited/:month', authenticate, (req, res) => {
-    var month = req.params.month;
-    Audit.find({ month: { $not: { $eq: month } }, empId: { $not: { $eq: "NA" } } }).then((aud) => {
-        res.status(200).send({
-            data: { data: aud, message: "Audit Added Successfully" },
-            code: 2000,
-            error: null
-        });
-    }).catch((e) => {
+    if (req.emp.role == "HR") {
+        var month = req.params.month;
+        Audit.find({ month: { $not: { $eq: month } }, empId: { $not: { $eq: "NA" } } }).then((aud) => {
+            res.status(200).send({
+                data: { data: aud, message: "Audit Added Successfully" },
+                code: 2000,
+                error: null
+            });
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });
+        })
+    } else {
         res.status(200).send({
             data: null,
             code: 4000,
-            error: e.message
+            error: "This request can only be made by HR"
         });
-    })
+    }
 })
 
 
@@ -457,121 +481,153 @@ app.get('/requirement/my', authenticate, (req, res) => {
 })
 
 app.get('/requirement/all/pending', authenticate, (req, res) => {
-    Requirement.find({ status: "Pending" }).then((requirement) => {
-        res.status(200).send({
-            data: { data: requirement, message: "Request Completed Successfully" },
-            code: 2000,
-            error: null
-        });
-    }).catch((e) => {
+    if (req.emp.role == "HR") {
+        Requirement.find({ status: "Pending" }).then((requirement) => {
+            res.status(200).send({
+                data: { data: requirement, message: "Request Completed Successfully" },
+                code: 2000,
+                error: null
+            });
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });
+        })
+    } else {
         res.status(200).send({
             data: null,
             code: 4000,
-            error: e.message
+            error: "This request can only be made by HR"
         });
-    })
+    }
 })
 
 app.get('/requirement/complete/:id', authenticate, (req, res) => {
-    var id = req.params.id
-    Requirement.findOne({ _id: id }).then((requirement) => {
-        if (!requirement) {
-            res.status(200).send({
-                data: null,
-                code: 4000,
-                error: `Requirement not found`
-            });
-        } else {
-            requirement.status = "Approved";
-            requirement.save().then(() => {
-                res.status(200).send({
-                    data: { data: requirement, message: "Requirement Approved Successfully" },
-                    code: 2000,
-                    error: null
-                });
-            }).catch((e) => {
+    if (req.emp.role == "HR") {
+        var id = req.params.id
+        Requirement.findOne({ _id: id }).then((requirement) => {
+            if (!requirement) {
                 res.status(200).send({
                     data: null,
                     code: 4000,
-                    error: e.message
+                    error: `Requirement not found`
                 });
-            })
-        }
-    }).catch((e) => {
+            } else {
+                requirement.status = "Approved";
+                requirement.save().then(() => {
+                    res.status(200).send({
+                        data: { data: requirement, message: "Requirement Approved Successfully" },
+                        code: 2000,
+                        error: null
+                    });
+                }).catch((e) => {
+                    res.status(200).send({
+                        data: null,
+                        code: 4000,
+                        error: e.message
+                    });
+                })
+            }
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });
+        })
+    } else {
         res.status(200).send({
             data: null,
             code: 4000,
-            error: e.message
+            error: "This request can only be made by HR"
         });
-    })
+    }
 })
 
 app.get('/requirement/reject/:id', authenticate, (req, res) => {
-    var id = req.params.id
-    Requirement.findOne({ _id: id }).then((requirement) => {
-        if (!requirement) {
-            res.status(200).send({
-                data: null,
-                code: 4000,
-                error: `Requirement not found`
-            });
-        } else {
-            requirement.status = "Rejected";
-            requirement.save().then(() => {
-                res.status(200).send({
-                    data: { data: requirement, message: "Requirement Rejected Successfully" },
-                    code: 2000,
-                    error: null
-                });
-            }).catch((e) => {
+    if (req.emp.role == "HR") {
+        var id = req.params.id
+        Requirement.findOne({ _id: id }).then((requirement) => {
+            if (!requirement) {
                 res.status(200).send({
                     data: null,
                     code: 4000,
-                    error: e.message
+                    error: `Requirement not found`
                 });
-            })
-        }
-    }).catch((e) => {
+            } else {
+                requirement.status = "Rejected";
+                requirement.save().then(() => {
+                    res.status(200).send({
+                        data: { data: requirement, message: "Requirement Rejected Successfully" },
+                        code: 2000,
+                        error: null
+                    });
+                }).catch((e) => {
+                    res.status(200).send({
+                        data: null,
+                        code: 4000,
+                        error: e.message
+                    });
+                })
+            }
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });
+        })
+    } else {
         res.status(200).send({
             data: null,
             code: 4000,
-            error: e.message
+            error: "This request can only be made by HR"
         });
-    })
+    }
 })
 
 app.post('/requirement/commenthr', authenticate, (req, res) => {
-    var body = _.pick(req.body, ['id', 'commentHr']);
-    Requirement.findOne({ _id: body.id }).then((requirement) => {
-        if (!requirement) {
-            res.status(200).send({
-                data: null,
-                code: 4000,
-                error: `Requirement not found`
-            });
-        } else {
-            requirement.commentHr = body.commentHr;
-            requirement.save().then(() => {
-                res.status(200).send({
-                    data: { data: requirement, message: "Comment Added Successfully" },
-                    code: 2000,
-                    error: null
-                });
-            }).catch((e) => {
+    if (req.emp.role == "HR") {
+        var body = _.pick(req.body, ['id', 'commentHr']);
+        Requirement.findOne({ _id: body.id }).then((requirement) => {
+            if (!requirement) {
                 res.status(200).send({
                     data: null,
                     code: 4000,
-                    error: e.message
+                    error: `Requirement not found`
                 });
-            })
-        }
-    }).catch((e) => {
+            } else {
+                requirement.commentHr = body.commentHr;
+                requirement.save().then(() => {
+                    res.status(200).send({
+                        data: { data: requirement, message: "Comment Added Successfully" },
+                        code: 2000,
+                        error: null
+                    });
+                }).catch((e) => {
+                    res.status(200).send({
+                        data: null,
+                        code: 4000,
+                        error: e.message
+                    });
+                })
+            }
+        }).catch((e) => {
+            res.status(200).send({
+                data: null,
+                code: 4000,
+                error: e.message
+            });
+        })
+    } else {
         res.status(200).send({
             data: null,
             code: 4000,
-            error: e.message
+            error: "This request can only be made by HR"
         });
-    })
+    }
 })
 
 
